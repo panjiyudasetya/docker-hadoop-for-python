@@ -1,5 +1,7 @@
 FROM bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8
 
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3
+
 MAINTAINER Ivan Ermilov <ivan.s.ermilov@gmail.com>
 
 HEALTHCHECK CMD curl -f http://localhost:9870/ || exit 1
