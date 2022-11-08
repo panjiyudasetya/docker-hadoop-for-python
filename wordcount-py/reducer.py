@@ -12,37 +12,42 @@ And then we will aggregates the dataset based on their Key.
 
 import sys
 
-current_word = None
-current_count = 0
-word = None
 
-# An input comes from the Python STDIN (standard input)
-for line in sys.stdin:
-    # Removes leading and trailing whitespace
-    line = line.strip()
+class Reducer:
+    word_count_dict = dict()
 
-    # Parse the input we got from the `mapper.py`
-    word, count = line.split('\t', 1)
+    def reduce(self):
+        self._reduce_word_counter()
+        self._print_result()
 
-    # Convert count (currently a string) to an integer
-    try:
-        count = int(count)
-    except ValueError:
-        # Count was not a number, so silently
-        # ignore/discard this line
-        continue
+    def _reduce_word_counter(self):
 
-    # The IF-switch only works because Hadoop sorts the Map output by key (here: word)
-    # before it is passed to the Reducer
-    if current_word == word:
-        current_count += count
-    else:
-        if current_word:
-            # write result to STDOUT
-            print ('%s\t%s' % (current_word, current_count))
-        current_count = count
-        current_word = word
+        # An input comes from the Python STDIN (standard input)
+        for line in sys.stdin:
+            # Removes leading and trailing whitespace
+            line = line.strip()
 
-# Do not forget to output the last word if needed!
-if current_word == word:
-    print('%s\t%s' % (current_word, current_count))
+            # Parse the input we got from the `mapper.py`
+            word, count = line.split('\t', 1)
+
+            # Convert count (currently a string) to an integer
+            try:
+                count = int(count)
+            except ValueError:
+                # Count was not a number, so silently
+                # ignore/discard this line
+                continue
+
+            if self.word_count_dict.get(word):
+                self.word_count_dict[word] += count
+            else:
+                self.word_count_dict[word] = count
+
+    def _print_result(self):
+
+        for word, counter in self.word_count_dict.items():
+            print('%s\t%s' % (word, counter))
+
+
+if __name__ == '__main__':
+    Reducer().reduce()
