@@ -12,23 +12,48 @@ It prints out the input data that comes from the Python STDIN
 
 import sys
 
-# Get all input that comes from the Python STDIN (standard input)
-input_lines = sys.stdin
+class Mapper:
+    word_count_dict = dict()
 
-# Converts every line in the input lines as a pair of Key/Value
-for line in input_lines:
-    # Removes leading and trailing whitespace
-    line = line.strip()
+    def map(self):
+        # Get all input that comes from the Python STDIN (standard input)
+        input_lines = sys.stdin
 
-    # Splits the line into words
-    words = line.split()
+        self._count_words_in_lines(input_lines)
+        self._print_result()
 
-    # Increase counters
-    for word in words:
-        # Write the results through the Python STDOUT (standard output);
-        # What we output here, we will use it as the input for the Reduce step,
-        # i.e. the input for reducer.py
-        #
-        # We use tab-delimiter to separate the pair of key and value;
-        # The trivial word count is 1
-        print('%s\t%s' % (word, 1))
+    def _count_words_in_lines(self, lines):
+
+        for line in lines:
+            # Removes leading and trailing whitespace
+            cleaned_line = line.strip()
+
+            self._count_words_in_line(cleaned_line)
+
+    def _count_words_in_line(self, line):
+
+        # Splits the line into words
+        words = line.split()
+
+        # Increase counters
+        for word in words:
+            if self.word_count_dict.get(word):
+                self.word_count_dict[word] += 1
+            else:
+                self.word_count_dict[word] = 1
+
+    def _print_result(self):
+        """
+        Write the results through the Python STDOUT (standard output);
+        What we output here, we will use it as the input for the Reduce step.
+        i.e. the input for the `reducer.py`
+
+        We use tab-delimiter to separate the pair of key and value;
+        """
+
+        for word, counter in self.word_count_dict.items():
+            print('%s\t%s' % (word, counter))
+
+
+if __name__ == '__main__':
+    Mapper().map()
